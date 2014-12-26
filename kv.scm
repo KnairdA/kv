@@ -11,6 +11,15 @@
 (define (expand-store repo)
   (conc base repo))
 
+(define (valid-entry? entry)
+  (= 2 (length entry)))
+
+(define (key-of-entry entry)
+  (car entry))
+
+(define (value-of-entry entry)
+  (car (cdr entry)))
+
 (define (list-files dir)
   (remove (lambda (x) (directory? (expand-store x)))
           (directory dir)))
@@ -20,16 +29,13 @@
        ((csv-parser) (read-all (expand-store store)))))
 
 (define (read-key store key)
-  (find (lambda (entry) (string=? key (car entry)))
+  (find (lambda (entry) (string=? key (key-of-entry entry)))
         (read-store store)))
-
-(define (valid-entry? entry)
-  (= 2 (length entry)))
 
 (define (print-store store)
   (for-each (lambda (entry)
               (if (valid-entry? entry)
-                (print (conc (first entry) ": " (second entry)))))
+                (print (key-of-entry entry) ": " (value-of-entry entry))))
             (read-store store)))
 
 (define (print-key store key)
@@ -41,7 +47,7 @@
 
 (define (add-unique store key value)
   (append (filter
-            (lambda (entry) (not (string=? key (car entry))))
+            (lambda (entry) (and (valid-entry? entry) (not (string=? key (key-of-entry entry)))))
             (read-store store))
           (list (list key value))))
 
