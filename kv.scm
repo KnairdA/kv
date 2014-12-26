@@ -23,8 +23,14 @@
   (find (lambda (entry) (string=? key (car entry)))
         (read-store store)))
 
+(define (valid-entry? entry)
+  (= 2 (length entry)))
+
 (define (print-store store)
-  (print (read-store store)))
+  (for-each (lambda (entry)
+              (if (valid-entry? entry)
+                (print (conc (first entry) ": " (second entry)))))
+            (read-store store)))
 
 (define (print-key store key)
   (print (second (read-key store key))))
@@ -33,16 +39,16 @@
   (if (directory? (create-directory base))
     (for-each print (list-files base))))
 
-(define (write-store store content)
-  (call-with-output-file (expand-store store)
-                         (lambda (output)
-                           (fmt output (dsp (format-csv (map list->csv-record content)))))))
-
 (define (add-unique store key value)
   (append (filter
             (lambda (entry) (not (string=? key (car entry))))
             (read-store store))
           (list (list key value))))
+
+(define (write-store store content)
+  (call-with-output-file (expand-store store)
+                         (lambda (output)
+                           (fmt output (dsp (format-csv (map list->csv-record content)))))))
 
 (define (write-key store key value)
     (write-store store (add-unique store key value)))
