@@ -20,6 +20,9 @@
 (define (value-of-entry entry)
   (car (cdr entry)))
 
+(define (flatten-value value)
+  (foldr (lambda (x y) (conc x " " y)) "" value))
+
 (define (list-files dir)
   (remove (lambda (x) (directory? (expand-store x)))
           (directory dir)))
@@ -57,7 +60,7 @@
                            (fmt output (dsp (format-csv (map list->csv-record content)))))))
 
 (define (write-key store key value)
-    (write-store store (add-unique store key value)))
+    (write-store store (add-unique store key (flatten-value value))))
 
 (define (perform-operation arguments)
   (let ((count (length arguments)))
