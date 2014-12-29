@@ -20,8 +20,13 @@
 (define (value-of-entry entry)
   (car (cdr entry)))
 
+(define (is-valid-entry-of-key key)
+  (lambda (entry)
+    (and (valid-entry? entry)
+         (not (string=? key (key-of-entry entry))))))
+
 (define (flatten-value value)
-  (foldr (lambda (x y) (conc x " " y)) "" value))
+  (string-intersperse value " "))
 
 (define (list-files dir)
   (remove (lambda (x) (directory? (expand-store x)))
@@ -38,7 +43,7 @@
 (define (print-store store)
   (for-each (lambda (entry)
               (if (valid-entry? entry)
-                (print (key-of-entry entry) ": " (value-of-entry entry))))
+                (print (key-of-entry entry))))
             (read-store store)))
 
 (define (print-key store key)
@@ -48,19 +53,22 @@
   (if (directory? (create-directory base))
     (for-each print (list-files base))))
 
-(define (add-unique store key value)
+(define (format-store store)
+  (format-csv (map list->csv-record store)))
+
+(define (change-key-value store key value)
   (append (filter
-            (lambda (entry) (and (valid-entry? entry) (not (string=? key (key-of-entry entry)))))
+            (is-valid-entry-of-key key)
             (read-store store))
           (list (list key value))))
 
 (define (write-store store content)
   (call-with-output-file (expand-store store)
                          (lambda (output)
-                           (fmt output (dsp (format-csv (map list->csv-record content)))))))
+                           (fmt output (dsp (format-store content))))))
 
 (define (write-key store key value)
-    (write-store store (add-unique store key (flatten-value value))))
+    (write-store store (change-key-value store key (flatten-value value))))
 
 (define (perform-operation arguments)
   (let ((count (length arguments)))
