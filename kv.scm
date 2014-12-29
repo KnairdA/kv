@@ -24,10 +24,9 @@
     (car (cdr entry))
     "invalid entry"))
 
-(define (is-valid-entry-of-key? key)
+(define (is-entry-of-key? key)
   (lambda (entry)
-    (and (valid-entry? entry)
-         (not (string=? key (key-of-entry entry))))))
+    (string=? key (key-of-entry entry))))
 
 (define (flatten-value value)
   (string-intersperse value " "))
@@ -39,18 +38,17 @@
 (define (read-store store)
   (let ((store (expand-store store)))
     (if (boolean? (file-exists? store))
-      (map csv-record->list
-           ((csv-parser) (read-all (expand-store store))))
-      (list))))
+      (list)
+      (filter valid-entry?
+              (map csv-record->list
+                   ((csv-parser) (read-all store)))))))
 
 (define (read-key store key)
-  (find (lambda (entry) (string=? key (key-of-entry entry)))
+  (find (is-entry-of-key? key)
         (read-store store)))
 
 (define (print-store store)
-  (for-each (lambda (entry)
-              (if (valid-entry? entry)
-                (print (key-of-entry entry))))
+  (for-each (lambda (entry) (print (key-of-entry entry)))
             (read-store store)))
 
 (define (print-key store key)
@@ -65,7 +63,7 @@
 
 (define (change-key-value store key value)
   (append (filter
-            (is-valid-entry-of-key? key)
+            (is-entry-of-key? key)
             (read-store store))
           (list (list key value))))
 
