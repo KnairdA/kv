@@ -12,15 +12,19 @@
   (conc base repo))
 
 (define (valid-entry? entry)
-  (= 2 (length entry)))
+  (if (list? entry)
+    (= 2 (length entry))
+    #f))
 
 (define (key-of-entry entry)
   (car entry))
 
 (define (value-of-entry entry)
-  (car (cdr entry)))
+  (if (valid-entry? entry)
+    (car (cdr entry))
+    "invalid entry"))
 
-(define (is-valid-entry-of-key key)
+(define (is-valid-entry-of-key? key)
   (lambda (entry)
     (and (valid-entry? entry)
          (not (string=? key (key-of-entry entry))))))
@@ -33,8 +37,11 @@
           (directory dir)))
 
 (define (read-store store)
-  (map csv-record->list
-       ((csv-parser) (read-all (expand-store store)))))
+  (let ((store (expand-store store)))
+    (if (boolean? (file-exists? store))
+      (map csv-record->list
+           ((csv-parser) (read-all (expand-store store))))
+      (list))))
 
 (define (read-key store key)
   (find (lambda (entry) (string=? key (key-of-entry entry)))
@@ -47,7 +54,7 @@
             (read-store store)))
 
 (define (print-key store key)
-  (print (second (read-key store key))))
+  (print (value-of-entry (read-key store key))))
 
 (define (print-all-stores)
   (if (directory? (create-directory base))
@@ -58,7 +65,7 @@
 
 (define (change-key-value store key value)
   (append (filter
-            (is-valid-entry-of-key key)
+            (is-valid-entry-of-key? key)
             (read-store store))
           (list (list key value))))
 
