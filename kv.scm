@@ -17,12 +17,14 @@
     #f))
 
 (define (key-of-entry entry)
-  (car entry))
+  (if (valid-entry? entry)
+    (car entry)
+    #f))
 
 (define (value-of-entry entry)
   (if (valid-entry? entry)
     (car (cdr entry))
-    "invalid entry"))
+    #f))
 
 (define (is-entry-of-key? key)
   (lambda (entry)
@@ -52,7 +54,10 @@
             (read-store store)))
 
 (define (print-key store key)
-  (print (value-of-entry (read-key store key))))
+  (let ((value (value-of-entry (read-key store key))))
+    (if (boolean? value)
+      (print "invalid entry")
+      (print value))))
 
 (define (print-all-stores)
   (if (directory? (create-directory base))
