@@ -20,6 +20,15 @@
 (define (flatten-value value)
   (string-intersperse value " "))
 
+(define (list->entry raw)
+  (if (and (list? raw) (= 2 (length raw)))
+    (make-entry (first raw) (second raw))
+    #f))
+
+(define (entry->record entry)
+  (list->csv-record
+    (list (entry-key entry) (entry-value entry))))
+
 (define (list-files dir)
   (remove (lambda (x) (directory? (expand-store x)))
           (directory dir)))
@@ -31,54 +40,51 @@
 (define (read-store store)
   (let ((store (expand-store store)))
     (if (boolean? (file-exists? store))
-      (list)
+      #f
       (filter entry?
-              (map (lambda (raw) (make-entry (first raw) (second raw)))
+              (map list->entry
                    (map csv-record->list
                         ((csv-parser) (read-all store))))))))
 
 (define (read-key store key)
-  (find (is-entry-of-key? key)
-        (read-store store)))
+  (find (is-entry-of-key? key) store))
 
 (define (print-store store)
-  (for-each (lambda (entry) (print (entry-key entry)))
-            (read-store store)))
+  (for-each (lambda (entry) (print (entry-key entry))) store))
 
-(define (print-key store key)
-  (let ((value (entry-value (read-key store key))))
-    (if (boolean? value)
-      (print "invalid entry")
-      (print value))))
+(define (print-value store key)
+  (let ((entry (read-key store key)))
+    (if (entry? entry)
+      (print (entry-value entry))
+      (print #f))))
 
 (define (print-all-stores)
   (for-each print (read-all-stores)))
 
 (define (format-store store)
-  (format-csv (map list->csv-record store)))
+  (format-csv (map entry->record store)))
 
-(define (delete-key-value store key)
-  (remove
-    (is-entry-of-key? key)
-    (read-store store)))
+(define (delete-entry store key)
+  (remove (is-entry-of-key? key) store))
 
-(define (change-key-value store key value)
-  (append (delete-key-value store key)
-          (list (list key value))))
+(define (change-entry store key value)
+  (append (delete-entry store key)
+          (list (make-entry key value))))
 
 (define (write-store store content)
   (call-with-output-file (expand-store store)
                          (lambda (output)
                            (fmt output (dsp (format-store content))))))
 
-(define (write-key store key value)
-    (write-store store (change-key-value store key (flatten-value value))))
+(define (write-entry source target key value)
+  (write-store target
+               (change-entry source key (flatten-value value))))
 
 (define (perform-operation arguments)
   (let ((count (length arguments)))
     (cond ((= 0 count) (print-all-stores))
-          ((= 1 count) (print-store (first arguments)))
-          ((= 2 count) (print-key   (first arguments) (second arguments)))
-          (else        (write-key   (first arguments) (second arguments) (drop arguments 2))))))
+          ((= 1 count) (print-store (read-store (first arguments))))
+          ((= 2 count) (print-value (read-store (first arguments)) (second arguments)))
+          (else        (write-entry (read-store (first arguments)) (first arguments) (second arguments) (drop arguments 2))))))
 
 (perform-operation (command-line-arguments))
