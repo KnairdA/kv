@@ -37,6 +37,10 @@
   (remove (lambda (x) (directory? (expand-store x)))
           (directory dir)))
 
+(define (read-all-stores)
+  (if (directory? (create-directory base))
+    (list-files base)))
+
 (define (read-store store)
   (let ((store (expand-store store)))
     (if (boolean? (file-exists? store))
@@ -60,16 +64,18 @@
       (print value))))
 
 (define (print-all-stores)
-  (if (directory? (create-directory base))
-    (for-each print (list-files base))))
+  (for-each print (read-all-stores)))
 
 (define (format-store store)
   (format-csv (map list->csv-record store)))
 
+(define (delete-key-value store key)
+  (remove
+    (is-entry-of-key? key)
+    (read-store store)))
+
 (define (change-key-value store key value)
-  (append (filter
-            (is-entry-of-key? key)
-            (read-store store))
+  (append (delete-key-value store key)
           (list (list key value))))
 
 (define (write-store store content)
