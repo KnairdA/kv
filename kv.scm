@@ -77,8 +77,11 @@
                            (fmt output (dsp (format-store content))))))
 
 (define (write-entry source target key value)
-  (write-store target
-               (change-entry source key (flatten-value value))))
+  (let ((source (if (equal? #f source)
+                  (list)
+                  source)))
+    (write-store target
+                 (change-entry source key (flatten-value value)))))
 
 (define (perform-operation arguments)
   (let ((count (length arguments)))
