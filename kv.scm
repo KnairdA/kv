@@ -39,7 +39,7 @@
 
 (define (read-store store)
   (let ((store (expand-store store)))
-    (if (boolean? (file-exists? store))
+    (if (equal? #f (file-exists? store))
       #f
       (filter entry?
               (map list->entry
@@ -50,13 +50,17 @@
   (find (is-entry-of-key? key) store))
 
 (define (print-store store)
-  (for-each (lambda (entry) (print (entry-key entry))) store))
+  (if (equal? #f store)
+    (print #f)
+    (for-each (lambda (entry) (print (entry-key entry))) store)))
 
 (define (print-value store key)
-  (let ((entry (read-key store key)))
-    (if (entry? entry)
-      (print (entry-value entry))
-      (print #f))))
+  (if (equal? #f store)
+    (print #f)
+    (let ((entry (read-key store key)))
+      (if (entry? entry)
+        (print (entry-value entry))
+        (print #f)))))
 
 (define (print-all-stores)
   (for-each print (read-all-stores)))
