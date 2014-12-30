@@ -8,27 +8,14 @@
 
 (define-values (format-cell format-record format-csv) (make-format))
 
+(define-record entry key value)
+
 (define (expand-store repo)
   (conc base repo))
 
-(define (valid-entry? entry)
-  (if (list? entry)
-    (= 2 (length entry))
-    #f))
-
-(define (key-of-entry entry)
-  (if (valid-entry? entry)
-    (car entry)
-    #f))
-
-(define (value-of-entry entry)
-  (if (valid-entry? entry)
-    (car (cdr entry))
-    #f))
-
 (define (is-entry-of-key? key)
   (lambda (entry)
-    (string=? key (key-of-entry entry))))
+    (string=? key (entry-key entry))))
 
 (define (flatten-value value)
   (string-intersperse value " "))
@@ -45,20 +32,21 @@
   (let ((store (expand-store store)))
     (if (boolean? (file-exists? store))
       (list)
-      (filter valid-entry?
-              (map csv-record->list
-                   ((csv-parser) (read-all store)))))))
+      (filter entry?
+              (map (lambda (raw) (make-entry (first raw) (second raw)))
+                   (map csv-record->list
+                        ((csv-parser) (read-all store))))))))
 
 (define (read-key store key)
   (find (is-entry-of-key? key)
         (read-store store)))
 
 (define (print-store store)
-  (for-each (lambda (entry) (print (key-of-entry entry)))
+  (for-each (lambda (entry) (print (entry-key entry)))
             (read-store store)))
 
 (define (print-key store key)
-  (let ((value (value-of-entry (read-key store key))))
+  (let ((value (entry-value (read-key store key))))
     (if (boolean? value)
       (print "invalid entry")
       (print value))))
