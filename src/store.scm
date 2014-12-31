@@ -29,6 +29,24 @@
   (list->csv-record
     (list (entry-key entry) (entry-value entry))))
 
+(define (store->print store)
+  (if (equal? #f store)
+    (print #f)
+    (foldr (lambda (entry accumulated)
+             (if (string-null?  accumulated)
+               (entry-key entry)
+               (conc (entry-key entry) #\newline accumulated)))
+           ""
+           store)))
+
+(define (entry->print store key)
+  (if (equal? #f store)
+    (print #f)
+    (let ((entry (read-key store key)))
+      (if (entry? entry)
+        (entry-value entry)
+        #f))))
+
 (define (list-files dir)
   (remove (lambda (x) (directory? (expand-store x)))
           (directory dir)))
@@ -48,19 +66,6 @@
 
 (define (read-key store key)
   (find (is-entry-of-key? key) store))
-
-(define (print-store store)
-  (if (equal? #f store)
-    (print #f)
-    (for-each (lambda (entry) (print (entry-key entry))) store)))
-
-(define (print-value store key)
-  (if (equal? #f store)
-    (print #f)
-    (let ((entry (read-key store key)))
-      (if (entry? entry)
-        (print (entry-value entry))
-        (print #f)))))
 
 (define (print-all-stores)
   (for-each print (read-all-stores)))
