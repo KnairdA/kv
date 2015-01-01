@@ -17,7 +17,7 @@
   (lambda (entry)
     (string=? key (entry-key entry))))
 
-(define (flatten-value value)
+(define (list->entry-value value)
   (string-intersperse value " "))
 
 (define (list->entry raw)
@@ -28,6 +28,9 @@
 (define (entry->record entry)
   (list->csv-record
     (list (entry-key entry) (entry-value entry))))
+
+(define (store->csv store)
+  (format-csv (map entry->record store)))
 
 (define (store->print store)
   (if (equal? #f store)
@@ -70,9 +73,6 @@
 (define (print-all-stores)
   (for-each print (read-all-stores)))
 
-(define (format-store store)
-  (format-csv (map entry->record store)))
-
 (define (delete-entry store key)
   (remove (is-entry-of-key? key) store))
 
@@ -83,11 +83,11 @@
 (define (write-store store content)
   (call-with-output-file (expand-store store)
                          (lambda (output)
-                           (fmt output (dsp (format-store content))))))
+                           (fmt output (dsp (store->csv content))))))
 
 (define (write-entry source target key value)
   (let ((source (if (equal? #f source)
                   (list)
                   source)))
     (write-store target
-                 (change-entry source key (flatten-value value)))))
+                 (change-entry source key (list->entry-value value)))))
