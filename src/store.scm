@@ -62,10 +62,9 @@
   (let ((store (expand-store store)))
     (if (equal? #f (file-exists? store))
       #f
-      (filter entry?
-              (map list->entry
-                   (map csv-record->list
-                        ((csv-parser) (read-all store))))))))
+      (map list->entry
+           (map csv-record->list
+                ((csv-parser) (read-all store)))))))
 
 (define (read-key store key)
   (find (is-entry-of-key? key) store))
