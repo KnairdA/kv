@@ -32,23 +32,23 @@
 (define (store->csv store)
   (format-csv (map entry->record store)))
 
+(define (entry->print store key)
+  (if (equal? #f store)
+    #f
+    (let ((entry (read-key store key)))
+      (if (entry? entry)
+        (entry-value entry)
+        #f))))
+
 (define (store->print store)
   (if (equal? #f store)
-    (print #f)
+    #f
     (foldr (lambda (entry accumulated)
              (if (string-null?  accumulated)
                (entry-key entry)
                (conc (entry-key entry) #\newline accumulated)))
            ""
            store)))
-
-(define (entry->print store key)
-  (if (equal? #f store)
-    (print #f)
-    (let ((entry (read-key store key)))
-      (if (entry? entry)
-        (entry-value entry)
-        #f))))
 
 (define (list-files dir)
   (remove (lambda (x) (directory? (expand-store x)))

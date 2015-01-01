@@ -18,13 +18,25 @@
                                 "key3"
                                 "value3")))
 
-(test-group "store-print"
+(test-group "entry-print"
             (test "entry->print"
                   "value2"
                   (entry->print (list (make-entry "key1" "value1") (make-entry "key2" "value2"))
                                 "key2"))
+            (test "entry->print (invalid entry)"
+                  #f
+                  (entry->print (list (make-entry "key1" "value1") (make-entry "key2" "value2"))
+                                "key3"))
+            (test "entry->print (invalid store)"
+                  #f
+                  (entry->print #f "key")))
+
+(test-group "store-print"
             (test "store->print"
                   (conc "key1" #\newline "key2")
-                  (store->print (list (make-entry "key1" "value1") (make-entry "key2" "value2")))))
+                  (store->print (list (make-entry "key1" "value1") (make-entry "key2" "value2"))))
+            (test "store->print (invalid store)"
+                  #f
+                  (store->print #f)))
 
 (test-exit)
