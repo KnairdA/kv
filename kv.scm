@@ -2,6 +2,8 @@
 
 (define base "~/.kv/")
 
+(define-record command name implementation)
+
 (define (file-in-base file)
   (conc base file))
 
@@ -10,11 +12,27 @@
        (remove (lambda (x) (directory? (file-in-base x)))
                (directory base))))
 
+(define commands (list
+  (make-command "show"
+                (lambda (arguments)
+                 (let ((count (length arguments)))
+                  (cond ((= 0 count) (print (stores->print (read-all-stores))))
+                        ((= 1 count) (print (path->store   (file-in-base   (first arguments)))))
+                        ((= 2 count) (print (entry-value   (entry-of-store (path->store (file-in-base (first arguments))) (second arguments)))))
+                        (else        (print "show: too many arguments"))))))))
+
+(define (name->command-implementation name)
+  (let ((command (find (lambda (command)
+                         (string=? name (command-name command)))
+                       commands)))
+    (if (equal? #f command)
+      (lambda (arguments)
+        ((name->command-implementation "show") (append (list name) arguments)))
+      (command-implementation command))))
+
 (define (perform-operation arguments)
-  (let ((count (length arguments)))
-    (cond ((= 0 count) (print       (stores->print (read-all-stores))))
-          ((= 1 count) (print       (path->store   (file-in-base   (first arguments)))))
-          ((= 2 count) (print       (entry-value   (entry-of-store (path->store (file-in-base (first arguments))) (second arguments)))))
-          (else        (write-entry (path->store   (file-in-base   (first arguments))) (second arguments) (drop arguments 2))))))
+  (if (null-list? arguments)
+    ((name->command-implementation "show")          (list))
+    ((name->command-implementation (car arguments)) (cdr arguments))))
 
 (perform-operation (command-line-arguments))
