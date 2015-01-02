@@ -11,6 +11,14 @@
 (define-record entry key value)
 (define-record store name path content)
 
+(define-record-printer (entry x output)
+  (fmt output (dsp (entry-key x))))
+
+(define-record-printer (store x output)
+  (if (null-list? (store-content x))
+    (fmt output (dsp #f))
+    (format output "~{~&~A~}" (store-content x))))
+
 ;; entry functions
 
 (define (is-entry-of-key? key)
@@ -53,20 +61,7 @@
     (path->store-content path)))
 
 (define (stores->print stores)
-  (foldr (lambda (store accumulated)
-           (if (string-null? accumulated)
-             (store-name store)
-             (conc (store-name store) #\newline accumulated)))
-           ""
-           stores))
-
-(define-record-printer (entry x output)
-  (fmt output (dsp (entry-key x))))
-
-(define-record-printer (store x output)
-  (if (null-list? (store-content x))
-    (fmt output (dsp #f))
-    (format output "~{~&~A~}" (store-content x))))
+  (format #f "~{~&~A~}" (map store-name stores)))
 
 (define (store->csv store)
   (format-csv (map entry->record (store-content store))))

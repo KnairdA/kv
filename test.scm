@@ -38,6 +38,9 @@
                   (fmt #f (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")))))
             (test "print empty store"
                   "#f"
-                  (fmt #f (make-dummy-store (list)))))
+                  (fmt #f (make-dummy-store (list))))
+            (test "print list of store"
+                  (conc "store1" #\newline "store2")
+                  (fmt #f (stores->print (list (make-store "store1" "" (list)) (make-store "store2" "" (list)))))))
 
 (test-exit)
