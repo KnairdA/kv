@@ -7,13 +7,13 @@
 
 (define (read-all-stores)
   (map (lambda (file) (path->store (file-in-base file)))
-       (remove (lambda (x) (directory? (file-in-base file)))
+       (remove (lambda (x) (directory? (file-in-base x)))
                (directory base))))
 
 (define (perform-operation arguments)
   (let ((count (length arguments)))
-    (cond ((= 0 count) (print (stores->print (read-all-stores base))))
-          ((= 1 count) (print (store->print  (path->store (file-in-base (first arguments))))))
+    (cond ((= 0 count) (print (stores->print (read-all-stores))))
+          ((= 1 count) (print (path->store   (file-in-base (first arguments)))))
           ((= 2 count) (print (entry->print  (path->store (file-in-base (first arguments))) (second arguments))))
           (else        (write-entry          (path->store (file-in-base (first arguments))) (second arguments) (drop arguments 2))))))
 

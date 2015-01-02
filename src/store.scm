@@ -3,6 +3,7 @@
 (use csv)
 (use csv-string)
 (use fmt)
+(use format)
 (use filepath)
 
 (define-values (format-cell format-record format-csv) (make-format))
@@ -59,15 +60,13 @@
            ""
            stores))
 
-(define (store->print store)
-  (if (null-list? (store-content store))
-    #f
-    (foldr (lambda (entry accumulated)
-             (if (string-null? accumulated)
-               (entry-key entry)
-               (conc (entry-key entry) #\newline accumulated)))
-           ""
-           (store-content store))))
+(define-record-printer (entry x output)
+  (fmt output (dsp (entry-key x))))
+
+(define-record-printer (store x output)
+  (if (null-list? (store-content x))
+    (fmt output (dsp #f))
+    (format output "~{~&~A~}" (store-content x))))
 
 (define (store->csv store)
   (format-csv (map entry->record (store-content store))))

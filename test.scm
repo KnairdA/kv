@@ -5,7 +5,7 @@
 (define (make-dummy-store content)
   (make-store "test" "" content))
 
-(test-group "store-manipulation"
+(test-group "store manipulation"
             (test "delete-entry"
                   (list (make-entry "key2" "value2"))
                   (delete-entry (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")))
@@ -21,7 +21,7 @@
                                 "key3"
                                 "value3")))
 
-(test-group "entry-print"
+(test-group "entry printing"
             (test "entry->print"
                   "value2"
                   (entry->print (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")))
@@ -34,12 +34,12 @@
                   #f
                   (entry->print (make-dummy-store (list)) "key")))
 
-(test-group "store-print"
-            (test "store->print"
+(test-group "store printing"
+            (test "print"
                   (conc "key1" #\newline "key2")
-                  (store->print (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")))))
-            (test "store->print (invalid store)"
-                  #f
-                  (store->print (make-dummy-store (list)))))
+                  (fmt #f (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")))))
+            (test "print (invalid store)"
+                  "#f"
+                  (fmt #f (make-dummy-store (list)))))
 
 (test-exit)
