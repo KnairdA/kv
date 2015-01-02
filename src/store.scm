@@ -29,12 +29,12 @@
   (list->csv-record
     (list (entry-key entry) (entry-value entry))))
 
-(define (entry->print store key)
+(define (entry-of-store store key)
   (if (null-list? (store-content store))
     #f
     (let ((entry (read-key store key)))
       (if (entry? entry)
-        (entry-value entry)
+        entry
         #f))))
 
 ;; store functions

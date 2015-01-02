@@ -21,24 +21,22 @@
                                 "key3"
                                 "value3")))
 
-(test-group "entry printing"
-            (test "entry->print"
-                  "value2"
-                  (entry->print (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")))
-                                "key2"))
-            (test "entry->print (invalid entry)"
+(test-group "store querying"
+            (test "entry-of-store"
+                  (make-entry "key2" "value2")
+                  (entry-of-store (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2"))) "key2"))
+            (test "entry-of-store (non-existing key)"
                   #f
-                  (entry->print (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")))
-                                "key3"))
-            (test "entry->print (invalid store)"
-                  #f
-                  (entry->print (make-dummy-store (list)) "key")))
+                  (entry-of-store (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2"))) "key3")))
 
 (test-group "store printing"
-            (test "print"
+            (test "print entry"
+                  "key"
+                  (fmt #f (make-entry "key" "value")))
+            (test "print store"
                   (conc "key1" #\newline "key2")
                   (fmt #f (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")))))
-            (test "print (invalid store)"
+            (test "print empty store"
                   "#f"
                   (fmt #f (make-dummy-store (list)))))
 
