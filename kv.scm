@@ -12,11 +12,16 @@
        (remove (lambda (x) (directory? (file-in-base x)))
                (directory base))))
 
+(define (value-or-false entry)
+  (if (entry? entry)
+    (entry-value entry)
+    #f))
+
 (define (perform-show arguments)
   (let ((count (length arguments)))
-    (cond ((= 0 count) (print (stores->print (read-all-stores))))
-          ((= 1 count) (print (path->store   (file-in-base   (first arguments)))))
-          ((= 2 count) (print (entry-value   (entry-of-store (path->store (file-in-base (first arguments))) (second arguments)))))
+    (cond ((= 0 count) (print (stores->print  (read-all-stores))))
+          ((= 1 count) (print (path->store    (file-in-base   (first arguments)))))
+          ((= 2 count) (print (value-or-false (entry-of-store (path->store (file-in-base (first arguments))) (second arguments)))))
           (else        (print "show: too many arguments")))))
 
 (define (perform-write arguments)
