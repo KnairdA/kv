@@ -24,8 +24,14 @@
     (write-entry (path->store (file-in-base (first arguments))) (second arguments) (drop arguments 2))
     (print "write: storage, key and value required")))
 
-(define commands (list (make-command "show"  perform-show)
-                       (make-command "write" perform-write)))
+(define (perform-delete arguments)
+  (if (>= (length arguments) 2)
+    (delete-entry (path->store (file-in-base (first arguments))) (second arguments))
+    (print "delete: storafe and key required")))
+
+(define commands (list (make-command "show"   perform-show)
+                       (make-command "write"  perform-write)
+                       (make-command "delete" perform-delete)))
 
 (define (name->command-implementation name)
   (let ((command (find (lambda (command)

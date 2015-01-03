@@ -80,14 +80,19 @@
         entry
         #f))))
 
-(define (delete-entry store key)
+(define (store-without-entry store key)
   (remove (is-entry-of-key? key) (store-content store)))
 
-(define (change-entry store key value)
-  (append (delete-entry store key)
+(define (store-with-entry-value store key value)
+  (append (store-without-entry store key)
           (list (make-entry key value))))
 
 (define (write-entry store key value)
   (write-store (make-store (store-name store)
                            (store-path store)
-                           (change-entry store key (list->entry-value value)))))
+                           (store-with-entry-value store key (list->entry-value value)))))
+
+(define (delete-entry store key)
+  (write-store (make-store (store-name store)
+                           (store-path store)
+                           (store-without-entry store key))))
