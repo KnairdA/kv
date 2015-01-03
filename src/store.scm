@@ -87,6 +87,8 @@
   (append (store-without-entry store key)
           (list (make-entry key value))))
 
+;; high level interface to read, change and commit manipulations in one call
+
 (define (write-entry store key value)
   (write-store (make-store (store-name store)
                            (store-path store)

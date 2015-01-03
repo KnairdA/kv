@@ -27,7 +27,7 @@
 (define (perform-delete arguments)
   (if (>= (length arguments) 2)
     (delete-entry (path->store (file-in-base (first arguments))) (second arguments))
-    (print "delete: storafe and key required")))
+    (print "delete: storage and key required")))
 
 (define commands (list (make-command "show"   perform-show)
                        (make-command "write"  perform-write)
