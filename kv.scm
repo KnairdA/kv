@@ -21,7 +21,7 @@
   (let ((count (length arguments)))
     (cond ((= 0 count) (print (stores->print  (read-all-stores))))
           ((= 1 count) (print (path->store    (file-in-base   (first arguments)))))
-          ((= 2 count) (print (value-or-false (entry-of-store (path->store (file-in-base (first arguments))) (second arguments)))))
+          ((= 2 count) (print (value-or-false (entry-of-store (store-content (path->store (file-in-base (first arguments)))) (second arguments)))))
           (else        (print "show: too many arguments")))))
 
 (define (perform-write arguments)
@@ -30,13 +30,19 @@
     (print "write: storage, key and value required")))
 
 (define (perform-delete arguments)
-  (if (>= (length arguments) 2)
+  (if (= (length arguments) 2)
     (delete-entry (path->store (file-in-base (first arguments))) (second arguments))
     (print "delete: storage and key required")))
 
+(define (perform-rename arguments)
+  (if (= (length arguments) 3)
+    (rename-entry (path->store (file-in-base (first arguments))) (second arguments) (third arguments))
+    (print "rename: storage, old-key and new-key required")))
+
 (define commands (list (make-command "show"   perform-show)
                        (make-command "write"  perform-write)
-                       (make-command "delete" perform-delete)))
+                       (make-command "delete" perform-delete)
+                       (make-command "rename" perform-rename)))
 
 (define (name->command-implementation name)
   (let ((command (find (lambda (command)

@@ -70,10 +70,10 @@
 ;; store entry access and manipulation
 
 (define (read-entry-by-key store key)
-  (find (is-entry-of-key? key) (store-content store)))
+  (find (is-entry-of-key? key) store))
 
 (define (entry-of-store store key)
-  (if (null-list? (store-content store))
+  (if (null-list? store)
     #f
     (let ((entry (read-entry-by-key store key)))
       (if (entry? entry)
@@ -81,7 +81,7 @@
         #f))))
 
 (define (store-without-entry store key)
-  (remove (is-entry-of-key? key) (store-content store)))
+  (remove (is-entry-of-key? key) store))
 
 (define (store-with-entry-value store key value)
   (append (store-without-entry store key)
@@ -92,9 +92,16 @@
 (define (write-entry store key value)
   (write-store (make-store (store-name store)
                            (store-path store)
-                           (store-with-entry-value store key (list->entry-value value)))))
+                           (store-with-entry-value (store-content store) key (list->entry-value value)))))
 
 (define (delete-entry store key)
   (write-store (make-store (store-name store)
                            (store-path store)
-                           (store-without-entry store key))))
+                           (store-without-entry (store-content store) key))))
+
+(define (rename-entry store old-key new-key)
+  (write-store (make-store (store-name store)
+                           (store-path store)
+                           (store-with-entry-value (store-without-entry (store-content store) old-key)
+                                                   new-key
+                                                   (entry-value (entry-of-store (store-content store) old-key))))))
