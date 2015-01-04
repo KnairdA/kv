@@ -8,26 +8,26 @@
 (test-group "store manipulation"
             (test "store-without-entry"
                   (list (make-entry "key2" "value2"))
-                  (store-without-entry (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")))
+                  (store-without-entry (list (make-entry "key1" "value1") (make-entry "key2" "value2"))
                                        "key1"))
             (test "store-with-entry-value (update)"
                   (list (make-entry "key1" "value1") (make-entry "key2" "updated-value"))
-                  (store-with-entry-value (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")))
+                  (store-with-entry-value (list (make-entry "key1" "value1") (make-entry "key2" "value2"))
                                           "key2"
                                           "updated-value"))
             (test "store-with-entry-value (create)"
                   (list (make-entry "key1" "value1") (make-entry "key2" "value2") (make-entry "key3" "value3"))
-                  (store-with-entry-value (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")))
+                  (store-with-entry-value (list (make-entry "key1" "value1") (make-entry "key2" "value2"))
                                           "key3"
                                           "value3")))
 
 (test-group "store querying"
             (test "entry-of-store"
                   (make-entry "key2" "value2")
-                  (entry-of-store (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2"))) "key2"))
+                  (entry-of-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")) "key2"))
             (test "entry-of-store (non-existing key)"
                   #f
-                  (entry-of-store (make-dummy-store (list (make-entry "key1" "value1") (make-entry "key2" "value2"))) "key3")))
+                  (entry-of-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")) "key3")))
 
 (test-group "store printing"
             (test "print entry"

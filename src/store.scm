@@ -89,6 +89,12 @@
 
 ;; high level interface to read, change and commit manipulations in one call
 
+(define (read-value store key)
+  (let ((entry (entry-of-store (store-content store) key)))
+    (if (entry? entry)
+      (entry-value entry)
+      #f)))
+
 (define (write-entry store key value)
   (write-store (make-store (store-name store)
                            (store-path store)
@@ -104,4 +110,4 @@
                            (store-path store)
                            (store-with-entry-value (store-without-entry (store-content store) old-key)
                                                    new-key
-                                                   (entry-value (entry-of-store (store-content store) old-key))))))
+                                                   (read-value store old-key)))))
