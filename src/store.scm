@@ -67,30 +67,22 @@
                          (lambda (output)
                            (fmt output (dsp (store->csv store))))))
 
-;; store entry access and manipulation
+;; entry list query and manipulation
 
-(define (read-entry-by-key store key)
-  (find (is-entry-of-key? key) store))
+(define (find-entry entries key)
+  (find (is-entry-of-key? key) entries))
 
-(define (entry-of-store store key)
-  (if (null-list? store)
-    #f
-    (let ((entry (read-entry-by-key store key)))
-      (if (entry? entry)
-        entry
-        #f))))
+(define (remove-entry entries key)
+  (remove (is-entry-of-key? key) entries))
 
-(define (store-without-entry store key)
-  (remove (is-entry-of-key? key) store))
-
-(define (store-with-entry-value store key value)
-  (append (store-without-entry store key)
-          (list (make-entry key value))))
+(define (append-unique-entry entries entry)
+  (append (remove-entry entries (entry-key entry))
+          (list entry)))
 
 ;; high level interface to read, change and commit manipulations in one call
 
 (define (read-value store key)
-  (let ((entry (entry-of-store (store-content store) key)))
+  (let ((entry (find-entry (store-content store) key)))
     (if (entry? entry)
       (entry-value entry)
       #f)))
@@ -98,16 +90,16 @@
 (define (write-entry store key value)
   (write-store (make-store (store-name store)
                            (store-path store)
-                           (store-with-entry-value (store-content store) key (list->entry-value value)))))
+                           (append-unique-entry (store-content store)
+                                                (make-entry key (list->entry-value value))))))
 
 (define (delete-entry store key)
   (write-store (make-store (store-name store)
                            (store-path store)
-                           (store-without-entry (store-content store) key))))
+                           (remove-entry (store-content store) key))))
 
 (define (rename-entry store old-key new-key)
   (write-store (make-store (store-name store)
                            (store-path store)
-                           (store-with-entry-value (store-without-entry (store-content store) old-key)
-                                                   new-key
-                                                   (read-value store old-key)))))
+                           (append-unique-entry (remove-entry (store-content store) old-key)
+                                                (make-entry new-key (read-value store old-key))))))

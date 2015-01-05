@@ -5,29 +5,27 @@
 (define (make-dummy-store content)
   (make-store "test" "" content))
 
-(test-group "store manipulation"
-            (test "store-without-entry"
+(test-group "entry list manipulation"
+            (test "remove-entry"
                   (list (make-entry "key2" "value2"))
-                  (store-without-entry (list (make-entry "key1" "value1") (make-entry "key2" "value2"))
-                                       "key1"))
-            (test "store-with-entry-value (update)"
+                  (remove-entry (list (make-entry "key1" "value1") (make-entry "key2" "value2"))
+                                "key1"))
+            (test "append-unique-entry (update)"
                   (list (make-entry "key1" "value1") (make-entry "key2" "updated-value"))
-                  (store-with-entry-value (list (make-entry "key1" "value1") (make-entry "key2" "value2"))
-                                          "key2"
-                                          "updated-value"))
-            (test "store-with-entry-value (create)"
+                  (append-unique-entry (list (make-entry "key1" "value1") (make-entry "key2" "value2"))
+                                       (make-entry "key2" "updated-value")))
+            (test "append-unique-entry (create)"
                   (list (make-entry "key1" "value1") (make-entry "key2" "value2") (make-entry "key3" "value3"))
-                  (store-with-entry-value (list (make-entry "key1" "value1") (make-entry "key2" "value2"))
-                                          "key3"
-                                          "value3")))
+                  (append-unique-entry (list (make-entry "key1" "value1") (make-entry "key2" "value2"))
+                                       (make-entry "key3" "value3"))))
 
-(test-group "store querying"
-            (test "entry-of-store"
+(test-group "entry list querying"
+            (test "find-entry"
                   (make-entry "key2" "value2")
-                  (entry-of-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")) "key2"))
-            (test "entry-of-store (non-existing key)"
+                  (find-entry (list (make-entry "key1" "value1") (make-entry "key2" "value2")) "key2"))
+            (test "find-entry (non-existing key)"
                   #f
-                  (entry-of-store (list (make-entry "key1" "value1") (make-entry "key2" "value2")) "key3")))
+                  (find-entry (list (make-entry "key1" "value1") (make-entry "key2" "value2")) "key3")))
 
 (test-group "store printing"
             (test "print entry"
