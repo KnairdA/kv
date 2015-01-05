@@ -87,19 +87,21 @@
       (entry-value entry)
       #f)))
 
-(define (write-entry store key value)
+(define (update-store-using store transformation)
   (write-store (make-store (store-name store)
                            (store-path store)
-                           (append-unique-entry (store-content store)
-                                                (make-entry key (list->entry-value value))))))
+                           (transformation (store-content store)))))
 
-(define (delete-entry store key)
-  (write-store (make-store (store-name store)
-                           (store-path store)
-                           (remove-entry (store-content store) key))))
+(define (write-entry key value)
+  (lambda (entries)
+    (append-unique-entry entries
+                         (make-entry key (list->entry-value value)))))
 
-(define (rename-entry store old-key new-key)
-  (write-store (make-store (store-name store)
-                           (store-path store)
-                           (append-unique-entry (remove-entry (store-content store) old-key)
-                                                (make-entry new-key (read-value store old-key))))))
+(define (delete-entry key)
+  (lambda (entries)
+    (remove-entry entries key)))
+
+(define (rename-entry old-key new-key)
+  (lambda (entries)
+    (append-unique-entry (remove-entry entries old-key)
+                         (make-entry new-key (entry-value (find-entry entries old-key))))))

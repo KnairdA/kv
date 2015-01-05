@@ -21,17 +21,20 @@
 
 (define (perform-write arguments)
   (if (>= (length arguments) 3)
-    (write-entry (path->store (file-in-base (first arguments))) (second arguments) (drop arguments 2))
+    (update-store-using (path->store (file-in-base (first arguments)))
+                        (write-entry (second arguments) (drop arguments 2)))
     (print "write: storage, key and value required")))
 
 (define (perform-delete arguments)
   (if (= (length arguments) 2)
-    (delete-entry (path->store (file-in-base (first arguments))) (second arguments))
+    (update-store-using (path->store (file-in-base (first arguments)))
+                        (delete-entry (second arguments)))
     (print "delete: storage and key required")))
 
 (define (perform-rename arguments)
   (if (= (length arguments) 3)
-    (rename-entry (path->store (file-in-base (first arguments))) (second arguments) (third arguments))
+    (update-store-using (path->store (file-in-base (first arguments)))
+                        (rename-entry (second arguments) (third arguments)))
     (print "rename: storage, old-key and new-key required")))
 
 (define commands (list (make-command "show"   perform-show)
