@@ -1,10 +1,10 @@
-(use srfi-1)
-(use posix)
-(use csv)
-(use csv-string)
-(use fmt)
-(use format)
-(use filepath)
+(use srfi-1
+     posix
+     csv
+     csv-string
+     fmt
+     format
+     filepath)
 
 (define-values (format-cell format-record format-csv) (make-format))
 

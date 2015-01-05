@@ -15,3 +15,5 @@ Accessing value of key _example_ in store _test_: `kv test example` or `kv show 
 Replacing or creating the value of key _example_ in store _test_ with _dummy_: `kv write test example dummy`
 
 Deleting key _example_ in store _test_: `kv delete test example`
+
+Renaming key _example_ in store _test_ to _example2_: `kv rename test example example2`
