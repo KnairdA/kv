@@ -8,9 +8,13 @@ While this sort of program may be useful for storing some commonly required data
 
 Listing all stores: `kv` or `kv show`
 
-Listing all keys in store _test_: `kv test` or `kv show test`
+Listing all keys of store _test_: `kv test` or `kv show test`
 
 Accessing value of key _example_ in store _test_: `kv test example` or `kv show test example`
+
+Listing all keys and values of all stores: `kv all`
+
+Listing all keys and values of store _test_: `kv all test`
 
 Replacing or creating the value of key _example_ in store _test_ with _dummy_: `kv write test example dummy`
 

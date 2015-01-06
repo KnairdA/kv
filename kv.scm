@@ -1,4 +1,5 @@
 (include "src/store.scm")
+(include "src/utility.scm")
 
 (define base "~/.kv/")
 
@@ -7,17 +8,23 @@
 (define (file-in-base file)
   (conc base file))
 
-(define (read-all-stores)
-  (map (lambda (file) (path->store (file-in-base file) #t))
+(define (read-all-stores #!optional do-not-read)
+  (map (lambda (file) (path->store (file-in-base file) do-not-read))
        (remove (lambda (x) (directory? (file-in-base x)))
                (directory base))))
 
 (define (perform-show arguments)
   (let ((count (length arguments)))
-    (cond ((= 0 count) (print (stores->print (read-all-stores))))
+    (cond ((= 0 count) (print (stores->print (read-all-stores #t))))
           ((= 1 count) (print                (path->store (file-in-base (first arguments)))))
           ((= 2 count) (print (read-value    (path->store (file-in-base (first arguments))) (second arguments))))
           (else        (print "show: too many arguments")))))
+
+(define (perform-all arguments)
+  (let ((count (length arguments)))
+    (cond ((= 0 count) (print (entries->pretty-print (merge-stores  (read-all-stores)))))
+          ((= 1 count) (print (entries->pretty-print (store-content (path->store (file-in-base (first arguments)))))))
+          (else        (print "all: too many arguments")))))
 
 (define (perform-write arguments)
   (if (>= (length arguments) 3)
@@ -38,6 +45,7 @@
     (print "rename: storage, old-key and new-key required")))
 
 (define commands (list (make-command "show"   perform-show)
+                       (make-command "all"    perform-all)
                        (make-command "write"  perform-write)
                        (make-command "delete" perform-delete)
                        (make-command "rename" perform-rename)))
