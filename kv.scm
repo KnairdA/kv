@@ -5,25 +5,18 @@
 
 (define-record command name implementation)
 
-(define (file-in-base file)
-  (conc base file))
-
-(define (read-all-stores #!optional do-not-read)
-  (map (lambda (file) (path->store (file-in-base file) do-not-read))
-       (remove (lambda (x) (directory? (file-in-base x)))
-               (directory base))))
-
 (define (perform-show arguments)
   (let ((count (length arguments)))
-    (cond ((= 0 count) (print (stores->print (read-all-stores #t))))
-          ((= 1 count) (print                (path->store (file-in-base (first arguments)))))
-          ((= 2 count) (print (read-value    (path->store (file-in-base (first arguments))) (second arguments))))
+    (cond ((= 0 count) (print (stores->print        (read-all-stores #t))))
+          ((= 1 count) (print                       (path->store (file-in-base (first arguments)))))
+          ((= 2 count) (print (read-entry-returning (path->store (file-in-base (first arguments))) (second arguments) entry-value)))
           (else        (print "show: too many arguments")))))
 
 (define (perform-all arguments)
   (let ((count (length arguments)))
     (cond ((= 0 count) (print (entries->pretty-print (merge-stores  (read-all-stores)))))
           ((= 1 count) (print (entries->pretty-print (store-content (path->store (file-in-base (first arguments)))))))
+          ((= 2 count) (print (read-entry-returning                 (path->store (file-in-base (first arguments))) (second arguments) entry->pretty-print)))
           (else        (print "all: too many arguments")))))
 
 (define (perform-write arguments)

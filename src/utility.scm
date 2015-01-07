@@ -1,9 +1,19 @@
 (use format)
 
-(define (entry->pretty-print entry offset)
+(define (file-in-base file)
+  (conc base file))
+
+(define (read-all-stores #!optional do-not-read)
+  (map (lambda (file) (path->store (file-in-base file) do-not-read))
+       (remove (lambda (x) (directory? (file-in-base x)))
+               (directory base))))
+
+(define (entry->pretty-print entry #!optional offset)
   (let ((key (entry-key entry)))
     (conc key
-          (make-string (- offset (string-length key)))
+          (make-string (if offset
+                         (- offset (string-length key))
+                         1))
           ": "
           (entry-value entry))))
 
@@ -14,10 +24,12 @@
         entries))
 
 (define (entries->pretty-print entries)
-  (let ((offset (+ 1 (maximum-key-length entries))))
-    (format #f "~{~&~A~}" (map (lambda (entry)
-                                 (entry->pretty-print entry offset))
-                               entries))))
+  (if (null-list? entries)
+    #f
+    (let ((offset (+ 1 (maximum-key-length entries))))
+      (format #f "~{~&~A~}" (map (lambda (entry)
+                                   (entry->pretty-print entry offset))
+                                 entries)))))
 
 (define (merge-stores stores)
   (fold (lambda (store entries)

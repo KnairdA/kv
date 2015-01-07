@@ -45,7 +45,7 @@
 ;; store conversion and serialization
 
 (define (path->store-content path)
-  (if (equal? #f (file-exists? path))
+  (if (not (file-exists? path))
     (list)
     (map list->entry
          (map csv-record->list
@@ -55,9 +55,9 @@
   (make-store
     (filepath:take-file-name path)
     path
-    (if (equal? #f do-not-read)
-      (path->store-content path)
-      (list))))
+    (if do-not-read
+      (list)
+      (path->store-content path))))
 
 (define (store->csv store)
   (format-csv (map entry->record (store-content store))))
@@ -81,10 +81,10 @@
 
 ;; high level interface to read, change and commit manipulations in one call
 
-(define (read-value store key)
+(define (read-entry-returning store key query)
   (let ((entry (find-entry (store-content store) key)))
     (if (entry? entry)
-      (entry-value entry)
+      (query entry)
       #f)))
 
 (define (update-store-using store transformation)
