@@ -103,5 +103,8 @@
 
 (define (rename-entry old-key new-key)
   (lambda (entries)
-    (append-unique-entry (remove-entry entries old-key)
-                         (make-entry new-key (entry-value (find-entry entries old-key))))))
+    (let ((old-entry (find-entry entries old-key)))
+      (if (entry? old-entry)
+          (append-unique-entry (remove-entry entries old-key)
+                               (make-entry new-key (entry-value old-entry)))
+          entries))))
