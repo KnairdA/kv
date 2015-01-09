@@ -34,10 +34,10 @@
   (let ((command (find (lambda (command)
                          (string=? name (command-name command)))
                        commands)))
-    (if (equal? #f command)
+    (if command
+      (command-implementation command)
       (lambda (arguments)
-        ((name->command-implementation "show") (append (list name) arguments)))
-      (command-implementation command))))
+        ((name->command-implementation "show") (append (list name) arguments))))))
 
 (define (perform-operation arguments)
   (if (null-list? arguments)
