@@ -10,14 +10,14 @@
     (cond ((= 0 count) (print (stores->print        (read-all-stores #t))))
           ((= 1 count) (print                       (path->store (file-in-base (first arguments)))))
           ((= 2 count) (print (read-entry-returning (path->store (file-in-base (first arguments))) (second arguments) entry-value)))
-          (else        (print "show: too many arguments")))))
+          (else        (print "show: storage and key required at most")))))
 
 (define (perform-all arguments)
   (let ((count (length arguments)))
     (cond ((= 0 count) (print (entries->pretty-print (merge-stores  (read-all-stores)))))
           ((= 1 count) (print (entries->pretty-print (store-content (path->store (file-in-base (first arguments)))))))
           ((= 2 count) (print (read-entry-returning                 (path->store (file-in-base (first arguments))) (second arguments) entry->pretty-print)))
-          (else        (print "all: too many arguments")))))
+          (else        (print "all: storage and key required at most")))))
 
 (define (perform-write arguments)
   (if (>= (length arguments) 3)
