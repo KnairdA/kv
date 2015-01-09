@@ -1,5 +1,4 @@
-(use srfi-1
-     posix
+(use posix
      csv
      csv-string
      fmt

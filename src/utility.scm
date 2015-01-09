@@ -1,5 +1,8 @@
 (use format)
 
+(define first-column-offset  0)
+(define second-column-margin 2)
+
 (define (file-in-base file)
   (conc base file))
 
@@ -18,8 +21,8 @@
 
 (define (entry->pretty-print entry #!optional printer)
   ((if printer printer
-               (make-key-value-pretty-printer 0
-                                              (+ 2
+               (make-key-value-pretty-printer first-column-offset
+                                              (+ second-column-margin
                                                  (string-length (entry-key entry)))))
    (entry-key entry)
    (entry-value entry)))
@@ -27,8 +30,8 @@
 (define (entries->pretty-print entries)
   (if (null-list? entries)
     #f
-    (let ((printer (make-key-value-pretty-printer 0
-                                                  (+ 2
+    (let ((printer (make-key-value-pretty-printer first-column-offset
+                                                  (+ second-column-margin
                                                      (maximum-key-length entries)))))
       (format #f "~{~&~A~}" (map (lambda (entry)
                                    (entry->pretty-print entry printer))
